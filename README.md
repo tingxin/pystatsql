@@ -35,4 +35,14 @@ source ~/new_py_env/bin/active
         }
     ]
 }
+
+```
+3. 保证程序的运行环境和两个数据库集群网络通
+```
+telnet xxxx 3306
+```
+
+4. 运行代码
+```shell
+python3 statm.py conf.json
 ```
