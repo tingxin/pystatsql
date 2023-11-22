@@ -4,9 +4,16 @@
     "max_count": 100000,
     "dbs": [
         {
-            "db": "business",
+            "db1": {
+                "name":"business",
+                "user": "demo",
+                "password": "Demo1234"
+            },
+           "db2": {
+            "name":"business",
             "user": "demo",
-            "password": "Demo1234",
+            "password": "Demo1234"
+           },
             "tables": [
                 {
                     "sql": "select * from goods"

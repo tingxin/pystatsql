@@ -9,13 +9,16 @@ from datetime import datetime
 
 max_count = 10
 
-def exe_check(host_source: str, db:str, user:str, password:str,  sql: str, cache: dict):
+def exe_check(host_source: str, db:dict,  sql: str, cache: dict):
+    db_name = db['name']
+    user = db['user']
+    password = db['password']
     parts = host_source.split(':')
     conn = pymysql.connect(host=parts[0],
                             port=int(parts[1]),
                             user=user,
                             password=password,
-                            database=db,
+                            database=db_name,
                             connect_timeout=1000)
     
     
@@ -47,7 +50,7 @@ def exe_check(host_source: str, db:str, user:str, password:str,  sql: str, cache
     
 
 
-def compare(task_fix,db,sql, result1: dict, result2: dict):
+def compare(task_fix,sql, result1: dict, result2: dict):
 
     l1 = len(result1)
     l2 = len(result2)
@@ -68,10 +71,15 @@ def compare(task_fix,db,sql, result1: dict, result2: dict):
                 check[key] = f"{key} not match: \n{big[key]}\n{small[key]}"
 
     with open(f'{os.getcwd()}/compare_mysql_{task_fix}.txt', 'a') as file:
-        file.write(f'db==> db SQL\n: {sql}\n分析结果:\n')
+        file.write(f'SQL\n: {sql}\n分析结果:\n')
         file.write(f'在集群1 扫描了: {l1}\n')
         file.write(f'在集群2 扫描了: {l2}\n')
+        if l1 == l2:
+            file.write('行数一致\n')
+        else:
+            file.write('错误：行数不致\n')
         if len(check) > 0:
+            file.write('错误：')
             for key, value in check.items():
                 file.write(f'{key}: {value}\n')
         else:
@@ -81,12 +89,12 @@ def compare(task_fix,db,sql, result1: dict, result2: dict):
     del check
 
 
-def run(task_fix, host_source, host_target, db,user,password,sql):
+def run(task_fix, host_source, host_target, db1,db2,sql):
     # 创建两个线程
     cache1 = dict()
     cache2 = dict()
-    thread1 = threading.Thread(target=exe_check, args=(host_source, db,user,password,sql,cache1,))
-    thread2 = threading.Thread(target=exe_check, args=(host_target, db,user,password,sql,cache2,))
+    thread1 = threading.Thread(target=exe_check, args=(host_source, db1,sql,cache1,))
+    thread2 = threading.Thread(target=exe_check, args=(host_target, db2,sql,cache2,))
 
     # 启动线程
     print(f"begin scan between {host_source} and {host_target} with sql:\n{sql}")
@@ -99,7 +107,7 @@ def run(task_fix, host_source, host_target, db,user,password,sql):
 
 
     print(f"begin compare  between {host_source} and {host_target} with sql:\n{sql}")
-    compare(task_fix,db, sql, cache1,cache2)
+    compare(task_fix, sql, cache1,cache2)
     print(f"end scan compare between {host_source} and {host_target} with sql:\n{sql}")
 
     del cache1
@@ -126,17 +134,17 @@ def main():
     task_fix = current_time.strftime("%Y-%m-%d_%H_%M_%S")
     for item in conf['dbs']:
         
-        db = item['db']
-        print(f"开始处理数据库 {db}")
-        user = item['user']
-        password = item['password']
+        db1 = item['db1']
+        db2 = item['db2']
+        print(f"开始处理数据库 {db1['name']}和{db2['name']}")
+       
         tables = item['tables']
 
         for table in tables:
             start_time = time.time()
             sql = table['sql']
 
-            run(task_fix, host_source, host_target, db,user,password, sql)
+            run(task_fix, host_source, host_target, db1,db2, sql)
             
             end_time = time.time()
 
