@@ -1,0 +1,20 @@
+{
+    "host_source": "tx-db.cqshokmqgqfv.ap-northeast-1.rds.amazonaws.com:3306",
+    "host_target": "tx-db.cqshokmqgqfv.ap-northeast-1.rds.amazonaws.com:3306",
+    "max_count": 100000,
+    "dbs": [
+        {
+            "db": "business",
+            "user": "demo",
+            "password": "Demo1234",
+            "tables": [
+                {
+                    "sql": "select * from goods"
+                },
+                {
+                    "sql": "select * from order_event"
+                }
+            ]
+        }
+    ]
+}
