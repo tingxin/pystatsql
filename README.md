@@ -7,6 +7,10 @@
 python3 -m venv new_py_env
 source ~/new_py_env/bin/active
 ```
+2. 安装依赖
+```shell
+pip install -r requirement.txt
+```
 2. 修改conf.json
 ```json
 {
