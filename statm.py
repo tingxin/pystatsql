@@ -8,6 +8,7 @@ import hashlib
 from datetime import datetime
 
 max_count = 10
+timeout = 3600
 
 def exe_check(host_source: str, db:dict,  sql: str, cache: dict):
     db_name = db['name']
@@ -19,7 +20,7 @@ def exe_check(host_source: str, db:dict,  sql: str, cache: dict):
                             user=user,
                             password=password,
                             database=db_name,
-                            connect_timeout=1000)
+                            connect_timeout=timeout)
     
     
     with conn.cursor() as cursor:
